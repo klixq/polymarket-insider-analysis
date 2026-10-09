@@ -1,4 +1,4 @@
-[Uploading report.md…]()
+[report.md](https://github.com/user-attachments/files/33229228/report.md)
 # Investigation of Potential Informed Trading on Polymarket
 
 ## 1. Objective
@@ -7,143 +7,217 @@ The goal of this research is to identify Polymarket wallets whose trading behavi
 
 This analysis does **not** prove that any wallet belongs to an insider. Instead, I use the term **potentially informed trading** and treat the identified wallets as candidates for further investigation.
 
+---
+
 ## 2. Data
 
-I used publicly available Polymarket data.
+I used publicly available Polymarket market and trade data.
 
-Research period:
-
-**November 1, 2025 – May 1, 2026**
+**Research period:** November 1, 2025 – May 1, 2026
 
 First, I collected all markets that closed during this period. There were **1,161 markets**.
 
 To keep the analysis manageable, I selected the **30 markets with the highest trading volume**.
 
-For these markets, I collected around **1.33 million trades**.
+For these markets, I collected approximately **1.33 million historical trades**.
 
 After limiting the trades to the research period, the dataset contained:
 
 - **383,615 trades**
 - **96,039 unique wallets**
 
-## 3. How I Looked for Suspicious Behavior
+### Scope limitation
 
-I used several simple signals.
+The top-30 markets are not fully independent observations. For example, the dataset contains multiple markets related to the same real-world event, such as different candidates in the NYC mayoral election and different NFL teams.
+
+Therefore, repeat activity across related markets should not be interpreted as completely independent evidence.
+
+---
+
+## 3. Screening Methodology
+
+I used several simple and explainable signals to identify potentially interesting wallets.
+
+| Signal | Rule | Why it matters |
+|---|---|---|
+| Winning outcome | Bought the outcome that eventually won | Initial screening signal |
+| Timing | Purchase made 6–72h before resolution | Focuses on potentially informative late positioning |
+| Trade size | Position of at least $1,000 | Removes very small trades |
+| 6h price movement | Favorable price movement after entry | Measures whether the entry was well timed |
+| Repeatability | Similar activity across multiple markets | Reduces the importance of one-off successful trades |
+| Bot-like activity | Extremely high trading frequency | Downweighted because it may indicate automated trading rather than information advantage |
 
 ### 3.1. Buying the Winning Outcome
 
 First, I looked at purchases of the outcome that eventually won.
 
-This signal alone does not mean much because successful traders are common. I therefore used it only as an initial filter.
+This signal alone is weak because successful traders are common. It was therefore used as an initial filter rather than as evidence of insider trading.
 
 ### 3.2. Timing
 
-I focused on purchases made **6–72 hours before the market closed**.
+I focused on purchases made **6–72 hours before market resolution**.
 
-The idea is simple: if a trader repeatedly takes a large position shortly before an event is resolved, it can be more interesting than normal long-term trading.
+The intuition is that a large position shortly before an event resolves may be more interesting than a position taken weeks or months earlier.
 
 ### 3.3. Trade Size
 
-To remove a large number of very small trades, I only considered purchases of at least **$1,000**.
+I considered purchases of at least **$1,000**.
 
-### 3.4. Price Movement After the Trade
+This removes a large number of small trades and focuses the investigation on positions that are more economically meaningful.
 
-For each purchase, I looked at how much the price of the same outcome increased during the following 6 hours.
+### 3.4. Price Movement After Entry
+
+For each qualifying purchase, I measured the maximum price of the same outcome during the following six hours.
 
 For example:
 
-- a trader buys at 0.80;
-- the price reaches 0.90 within the next few hours;
-- the price movement is +10 percentage points.
+- trader buys at 0.80;
+- the outcome reaches 0.90 during the following six hours;
+- the measured price movement is **+10 percentage points**.
 
-This is **not the trader's actual profit**. It is only a way to measure whether the entry was well timed.
+This is **not realized profit or P&L**. It is only a measure of how favorable the entry was shortly after the trade.
 
 ### 3.5. Repeatability
 
-I also checked whether similar behavior appeared across multiple markets.
+I checked whether similar behavior appeared across multiple markets.
 
-One successful trade can easily be luck.
+One successful trade can easily be explained by luck.
 
-If a wallet repeatedly makes similar trades across different markets, it becomes more interesting.
+Repeated large positions on eventual winners across several markets are more interesting and therefore receive higher investigation priority.
 
-### 3.6. Bots and Very Frequent Trading
+### 3.6. Bot-like Activity
 
-Some wallets make thousands of small trades and look more like bots or market makers.
+Some wallets trade extremely frequently and may behave like automated market makers or trading bots.
 
-For example, one wallet made more than 3,000 trades on a single market.
+For example, one wallet in the dataset made more than 3,000 trades on a single market.
 
-I did not treat this type of activity as strong evidence of insider trading and reduced its priority in the ranking.
+I did not treat this behavior as strong evidence of insider trading and reduced its priority in the ranking.
 
-## 4. Ranking
+---
 
-For each wallet, I considered:
+## 4. Ranking Methodology
+
+The ranking is an **investigation-priority score**, not a probability of insider trading.
+
+The main components considered were:
 
 - number of different markets;
-- size of positions;
-- time before market resolution;
-- how often the price moved in the wallet's favor after entry;
+- total notional of qualifying positions;
+- average entry price;
+- timing relative to resolution;
+- favorable price movement after entry;
 - repeatability across markets;
-- signs of bot-like trading.
+- signs of bot-like activity.
 
-The resulting score is only used to **prioritize wallets for further investigation**.
+The purpose of the ranking is to answer:
 
-It should not be interpreted as the probability that a wallet is an insider.
+> Which wallets would be most useful to investigate manually first?
+
+It is not intended to answer:
+
+> What is the probability that this wallet is an insider?
+
+---
 
 ## 5. Main Candidates
 
-### 1. `0x24c8...`
+The screening produced a shortlist of wallets with particularly interesting combinations of size, timing, repeatability and favorable subsequent price movement.
 
-One of the most interesting wallets in the dataset.
+### Ranking overview
 
-It made several large purchases around 8–12 hours before market resolution.
+| Rank | Wallet      | Markets | Qualifying Notional | Avg. Entry | Avg. 6h Move | Priority |
+|---:  |---          |---:     |---:                 |---:        |---:          |---       |
+| 1    | `0x24c8...` | 4       | ~$125K              | 0.940      | +2.95 pp     | High     |
+| 2    | `0x7c3d...` | 3       | ~$72K               | 0.939      | +4.15 pp     | High     |
+| 3    | `0xd218...` | 4       | ~$397K              | 0.949      | +1.89 pp     | High     |
+| 4    | `0x0c4b...` | 3       | ~$216K              | 0.925      | +3.31 pp     | High     |
+| 5    | `0xbacd...` | 3       | ~$30K               | 0.869      | +5.28 pp     | High     |
 
-For example, on the Mamdani market, it made several purchases ranging from a few thousand dollars to tens of thousands of dollars. After these purchases, the price continued to move up by roughly 2–5 percentage points.
+These five wallets were selected for manual review because they combined multiple signals rather than because of any single trade.
 
-The behavior appears relatively repeatable, which is why this wallet received a high priority.
+### 5.1. `0x24c8...`
 
-### 2. `0x7c3d...`
+This is one of the cleanest patterns in the dataset.
 
-Another interesting candidate.
+The wallet made several relatively large purchases close to market resolution, particularly in the Mamdani market.
 
-Across several markets, this wallet entered at relatively low prices and the price increased significantly afterwards.
+Several entries were followed by favorable price movements of approximately 2–5 percentage points.
 
-The Trump UFO market was particularly interesting, with some purchases followed by price movements of around **+8–13 percentage points**.
+Examples include purchases around:
 
-This was one of the more noticeable patterns in the dataset.
+- 0.932–0.934 in the Mamdani market;
+- approximately $17K–$42K positions around 12 hours before resolution;
+- a ~$21K position on Andrew Cuomo around 8 hours before resolution.
 
-### 3. `0xd218...`
+The repeated nature of these entries makes this wallet particularly interesting.
 
-This wallet stands out because of its trading volume and repeatability.
+### 5.2. `0x7c3d...`
 
-It traded across several markets and had around **$397K** in qualifying trades.
+This wallet showed several relatively early entries at lower prices followed by larger favorable movements.
 
-There is an important caveat, however: some of this volume was purchased at prices close to 0.999. These trades are less informative because the outcome was already considered almost certain.
+The strongest examples were in the Trump UFO market, where some entries were followed by price movements of approximately **+8–13 percentage points**.
 
-Because of this, I consider the wallet interesting, but its results should be interpreted carefully.
+This combination of relatively early positioning, meaningful trade size and repeated favorable movement makes the wallet a high-priority candidate.
 
-### 4. `0x0c4b...`
+### 5.3. `0xd218...`
+
+This wallet stands out primarily because of its size and repeatability.
+
+It had approximately **$397K** in qualifying trades across four markets.
+
+There is, however, an important caveat: a significant portion of its activity was at prices close to **0.999**.
+
+Such trades are less informative because the market outcome was already priced as almost certain.
+
+Therefore, this wallet is interesting because of its scale and repeatability, but its raw volume should not be interpreted as direct evidence of informed trading.
+
+### 5.4. `0x0c4b...`
 
 This wallet made relatively large purchases across several markets.
 
-The more interesting trades were earlier purchases at lower prices, followed by further price increases.
+The more interesting positions were earlier purchases at lower prices, followed by additional upward price movement.
 
-For example, on one market it bought at prices around 0.86–0.94, followed by several percentage points of upward movement.
+For example, several trades in the Trump UFO market were made between approximately 0.86 and 0.94 and were followed by favorable movements of several percentage points.
 
-The behavior is interesting, although there is not enough evidence to call it insider trading.
+The pattern is interesting, although there is not enough evidence to distinguish informed trading from a strong trading strategy or good market analysis.
 
-### 5. `0xbacd...`
+### 5.5. `0xbacd...`
 
-This wallet had a smaller overall volume, but several particularly interesting trades.
+This wallet had a smaller overall volume but some of the strongest individual examples.
 
-For example:
+In the Trump UFO market, several positions were followed by large favorable price movements.
 
-- 0.60 → around +23 percentage points
-- 0.66 → around +17 percentage points
-- 0.84 → followed by further upward movement
+Examples include:
 
-Because of these trades, the wallet looks like one of the more interesting candidates for further investigation.
+- entry at **0.600 → approximately +23 pp**
+- entry at **0.661 → approximately +17 pp**
+- entry at **0.837 → approximately +2 pp**
 
-## 6. What Did We Find?
+These trades make the wallet particularly interesting for manual investigation, despite its smaller total notional.
+
+---
+
+## 6. Examples of Trades Driving Investigation Priority
+
+The following trades illustrate why the wallets above received higher investigation priority.
+
+| Wallet      | Market               | Entry Price | Position | Hours Before Resolution | Max 6h Move |
+|---          |---                   |---:         |---:      |---:                     |---:         |
+| `0x24c8...` | Mamdani              | 0.934       | ~$41.6K  | 11.8h                   | +2.5 pp     |
+| `0x24c8...` | Andrew Cuomo         | 0.940       | ~$21.1K  | 8.3h                    | +5.9 pp     |
+| `0x7c3d...` | Trump UFO            | 0.858       | ~$2.2K   | 21.8h                   | +13.3 pp    |
+| `0x7c3d...` | Trump UFO            | 0.910       | ~$2.9K   | 21.1h                   | +8.1 pp     |
+| `0xbacd...` | Trump UFO            | 0.600       | ~$1.3K   | 50.2h                   | +23.0 pp    |
+| `0xbacd...` | Trump UFO            | 0.661       | ~$1.5K   | 49.4h                   | +16.9 pp    |
+| `0xd218...` | New England Patriots | 0.678       | ~$2.0K   | 7.9h                    | +32.1 pp    |
+
+These examples should be interpreted as **screening evidence**, not as proof of insider knowledge.
+
+In particular, the six-hour price movement is a market-price metric rather than realized trader profit.
+
+---
+
+## 7. What Did We Find?
 
 The research **does not allow us to say that we found actual insiders**.
 
@@ -153,7 +227,7 @@ Instead, we found several wallets that:
 - made relatively large trades;
 - sometimes entered shortly before resolution;
 - showed favorable price movement after entry;
-- repeated this behavior across multiple markets.
+- repeated similar behavior across multiple markets.
 
 The main candidates are:
 
@@ -163,28 +237,71 @@ The main candidates are:
 4. `0x0c4b...`
 5. `0xbacd...`
 
-There may be completely normal explanations for this behavior, such as strong market analysis, faster access to public information, arbitrage, a specific trading strategy, or simply luck.
+There may be completely normal explanations for this behavior, including:
 
-## 7. Limitations
+- strong market analysis;
+- faster interpretation of public information;
+- arbitrage;
+- market-making or systematic trading;
+- correlated positions across related markets;
+- or simply luck.
+
+The analysis therefore identifies **investigation candidates rather than confirmed insiders**.
+
+---
+
+## 8. Limitations
 
 There are several important limitations to this analysis.
 
-First, the analysis is **retrospective**, so the final market outcome is already known.
+### Retrospective selection
 
-Second, correctly predicting the outcome is not, by itself, evidence of insider trading.
+The analysis uses the final market outcome to identify successful trades. This creates an unavoidable retrospective bias.
 
-Third, the price movement after a trade is not the trader's actual realized profit.
+### No proof of information advantage
 
-The dataset also contains related markets, such as multiple markets about the same candidate or different teams in the same sports event. Therefore, the markets cannot be treated as fully independent observations.
+Correctly predicting an outcome does not prove access to non-public information.
 
-Finally, this research uses only public information and does not attempt to identify the real-world owner of any wallet.
+### Price movement is not P&L
 
-## 8. Conclusion
+The six-hour price movement measures how the market moved after entry. It does not account for whether the trader actually sold, held the position, or realized a profit.
 
-The main result of this research is not proof of insider trading, but rather a **shortlist of wallets with unusually interesting trading behavior**.
+### Related markets
 
-The approach is intentionally simple and explainable: position size, timing, repeatability, and price movement after entry.
+The selected top-30 markets are not fully independent. Several markets may correspond to the same underlying real-world event.
 
-These signals make it possible to explain why a particular wallet received a higher investigation priority.
+### Automated trading
 
-A useful next step would be to compare these wallets against a larger group of normal traders and study their activity immediately before specific real-world events.
+Some wallets may be bots, market makers or arbitrageurs. Their high success rate may have little to do with insider information.
+
+### Public data only
+
+This investigation uses public blockchain and Polymarket data. It does not attempt to identify the real-world owner of any wallet or access private communications.
+
+### Limited market scope
+
+The analysis focuses on the 30 highest-volume markets rather than every market on Polymarket. This makes the investigation more manageable but means that potentially interesting behavior in lower-volume markets may have been missed.
+
+---
+
+## 9. Conclusion
+
+The main result of this research is not proof of insider trading, but a **shortlist of wallets with unusually interesting trading behavior**.
+
+The approach is intentionally simple and explainable:
+
+**position size + timing + repeatability + favorable price movement**
+
+This makes it possible to explain why a particular wallet received a higher investigation priority without relying on an opaque machine-learning model.
+
+The five highest-priority candidates identified in this analysis are:
+
+| Priority | Wallet      | Main Reason for Investigation                                            |
+|---:      |---          |---                                                                       |
+| 1        | `0x24c8...` | Repeated large entries close to resolution with favorable movement       |
+| 2        | `0x7c3d...` | Several lower-price entries followed by strong upward movement           |
+| 3        | `0xd218...` | Large and repeated activity across markets, with some very strong trades |
+| 4        | `0x0c4b...` | Large repeated positions across several markets                          |
+| 5        | `0xbacd...` | Smaller volume but unusually strong individual entries                   |
+
+A useful next step would be to compare these wallets against a larger sample of ordinary traders and measure whether their timing and post-entry performance are statistically unusual. Another useful extension would be to investigate activity immediately before specific real-world events and compare trading behavior with the timing of public information releases.
