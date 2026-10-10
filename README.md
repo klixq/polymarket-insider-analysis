@@ -97,4 +97,4 @@ Correctly predicting an outcome does not prove insider trading. Price movement a
 The selected markets are not fully independent, and some wallets may be professional traders, arbitrageurs, or automated strategies rather than insiders.
 
 Therefore, the results should be interpreted as a **shortlist for further investigation**, not as proof of misconduct.
-<!-- Final research submission -->
+This repository contains the research report, analysis notebook, and CSV artifacts for the Polymarket potential informed trading investigation.
